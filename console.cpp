@@ -1,14 +1,25 @@
-﻿#include "console.h"
+﻿#ifdef _WIN32
+#include <windows.h>
+#include <conio.h>
+#else
+#include <locale>
+#include <termios.h>
+#include <unistd.h>
+#endif
+#include "console.h"
 
-void InitializeConsole() {
+/*Ustawianie kodowania konsoli na UTF-8 w zależności od systemu operacyjnego,
+aby poprawnie były wyświetlane polskie znaki*/
+void initializeConsole() {
     #ifdef _WIN32
-        SetConsoleOutputCP(CP_UTF8); //do włączenia kodowania utf-8 na Windows-ie, niezależnie jakie w ustawieniach jest włączone locale (u mnie nie działało locale)
+        SetConsoleOutputCP(CP_UTF8);
     #else
-        setlocale(LC_ALL, "pl_PL.UTF-8"); //tak samo ale dla systemów Linux i MacOS
+        setlocale(LC_ALL, "pl_PL.UTF-8");
     #endif
 }
 
-void ConsoleClear() { //funkcja służąca do czyszczenia konsoli, bierze pod uwagę system operacyjny
+//Funckja czyszcząca konsolę w zależności od systemu operacyjnego
+void consoleClear() {
     #ifdef _WIN32
         system("cls");
     #else
@@ -16,9 +27,10 @@ void ConsoleClear() { //funkcja służąca do czyszczenia konsoli, bierze pod uw
     #endif
 }
 
-char GetKey() { //to jest funkcja która pobiera wciśnięty klawisz, zrobiona osobno, aby działała na Windows i Linux
+//Funkcja pobierająca wciśnięty na klawiaturze znak, potrzebna do zrobienia interaktywnego menu
+char getKey() {
 #ifdef _WIN32
-    return _getch(); //to pozwala na pobieranie klawisza z klawiatury bez buforowania konsoli
+    return _getch();
 #else
     struct termios oldt, newt;
     char ch;

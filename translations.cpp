@@ -33,7 +33,7 @@ void loadTranslations(const std::string& language) {
     }
 }
 
-/*funkcja ta szuka tłumaczenia w mapie "translations" na podstawie słowa kluczowego, jeżeli istnieje 
+/*Funkcja ta szuka tłumaczenia w mapie "translations" na podstawie słowa kluczowego, jeżeli istnieje 
 to zwraca jego wartość, a jak nie istnieje to zwraca słowo kluczowe*/
 std::string T(const std::string& key) {
     if (translations.find(key) != translations.end()) {
