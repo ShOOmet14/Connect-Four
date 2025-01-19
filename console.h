@@ -9,3 +9,6 @@ void consoleClear();
 
 //Funkcja pobierająca wciśnięty na klawiaturze znak, potrzebna do zrobienia interaktywnego menu
 char getKey();
+
+//Funkcja zmieniająca kolory w konsoli
+void setConsoleColor(int color);

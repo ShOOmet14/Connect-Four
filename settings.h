@@ -5,7 +5,6 @@
 extern int boardSize; //Rozmiar planszy gry
 extern int checkSize; //Liczba symboli w rzędzie, która wymagana jest do wygrania
 extern bool polish; //Zmienna, która ustawią język na polski, albo angielski
-extern int animationSpeed; //prędkość animacji (spadania symboli) w milisekundach
 extern char player1Symbol; //symbol gracza 1
 extern char player2Symbol; //symbol gracza 2
 extern int aiDifficulty; //poziom trudności AI, w skali 1-5

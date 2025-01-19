@@ -19,7 +19,7 @@ int player2Score = 0;
 rememberMode - jeżeli prawidziwa, to gra używa poprzedniego trybu (hot seat / vs AI)
 previousAgainstAI - określa czy ostatnia gra była przeciwko AI*/
 void play(bool rememberMode, bool previousAgainstAI) {
-    static bool againstAI = false; //Do zapamiętywania trybu gry
+    bool againstAI = false; //Do zapamiętywania trybu gry
     if (!rememberMode) {
         std::vector<std::string> playModeMenu = {
             T("Hot Seat (Player vs Player)"),
@@ -95,6 +95,18 @@ void play(bool rememberMode, bool previousAgainstAI) {
         //Sprawdź wygraną i remis
         if (checkWin(board, playerSymbols[currentPlayer - 1])) {
             consoleClear();
+            // Display final board
+            for (size_t row = 0; row < boardSize; row++) {
+                for (size_t col = 0; col < boardSize; col++) {
+                    std::cout << "| " << board[row][col] << " ";
+                }
+                std::cout << "|\n";
+                for (size_t col = 0; col < boardSize; col++) {
+                    std::cout << "----";
+                }
+                std::cout << "\n";
+            }
+
             std::cout << T("Player") << " " << currentPlayer << " (" << playerSymbols[currentPlayer - 1] << ") " << T("wins!") << "\n";
 
             if (currentPlayer == 1) {
@@ -153,60 +165,22 @@ void play(bool rememberMode, bool previousAgainstAI) {
 //Funkcja, która sprawdza czy dany symbol ułożył ciąg wystarczającej długości w pionie, poziomie i na ukos, aby wygrać
 bool checkWin(const std::vector<std::vector<char>>& board, char symbol) {
     int n = board.size();
+    std::vector<std::pair<int, int>> directions = { {0, 1}, {1, 0}, {1, 1}, {1, -1} };
 
-    //Sprawdzenie poziome
     for (int row = 0; row < n; row++) {
-        for (int col = 0; col <= n - checkSize; col++) {
-            bool win = true;
-            for (int k = 0; k < checkSize; k++) {
-                if (board[row][col + k] != symbol) {
-                    win = false;
-                    break;
+        for (int col = 0; col < n; col++) {
+            for (const auto& [dRow, dCol] : directions) {
+                bool win = true;
+                for (int k = 0; k < checkSize; k++) {
+                    int newRow = row + k * dRow;
+                    int newCol = col + k * dCol;
+                    if (newRow >= n || newCol >= n || newCol < 0 || board[newRow][newCol] != symbol) {
+                        win = false;
+                        break;
+                    }
                 }
+                if (win) return true;
             }
-            if (win) return true;
-        }
-    }
-
-    //Sprawdzenie pionowe
-    for (int col = 0; col < n; col++) {
-        for (int row = 0; row <= n - checkSize; row++) {
-            bool win = true;
-            for (int k = 0; k < checkSize; k++) {
-                if (board[row + k][col] != symbol) {
-                    win = false;
-                    break;
-                }
-            }
-            if (win) return true;
-        }
-    }
-
-    //Sprawdzenie ukośne (lewo-dół do prawo-góra)
-    for (int row = 0; row <= n - checkSize; row++) {
-        for (int col = 0; col <= n - checkSize; col++) {
-            bool win = true;
-            for (int k = 0; k < checkSize; k++) {
-                if (board[row + k][col + k] != symbol) {
-                    win = false;
-                    break;
-                }
-            }
-            if (win) return true;
-        }
-    }
-
-    //Sprawdzenie ukośne (prawo-dół do lewo-góra)
-    for (int row = 0; row <= n - checkSize; row++) {
-        for (int col = checkSize - 1; col < n; col++) {
-            bool win = true;
-            for (int k = 0; k < checkSize; k++) {
-                if (board[row + k][col - k] != symbol) {
-                    win = false;
-                    break;
-                }
-            }
-            if (win) return true;
         }
     }
     return false;
@@ -225,18 +199,34 @@ int navigateColumn(std::vector<std::vector<char>>& board, size_t& selectedColumn
             std::cout << header << "\n\n";
         }
 
-        //Wyświetlanie planszy z podświetloną kolumną
-        for (size_t row = 0; row < board.size(); row++) {
-            for (size_t col = 0; col < board[row].size(); col++) {
-                if (col == selectedColumn) {
-                    std::cout << "| " << board[row][col] << " ";
+        //Wyświetlanie planszy
+        for (size_t row = 0; row < boardSize; row++) {
+            for (size_t col = 0; col < boardSize; col++) {
+                std::cout << "| "; // Separator i spacja w domyślnym kolorze
+
+                // Ustaw kolor w zależności od symbolu
+                if (board[row][col] == player1Symbol) {
+                    setConsoleColor(10); // Jasny zielony dla gracza 1
+                }
+                else if (board[row][col] == player2Symbol) {
+                    setConsoleColor(14); // Jasny żółty dla gracza 2
                 }
                 else {
-                    std::cout << "| " << board[row][col] << " ";
+                    setConsoleColor(7); // Domyślny kolor dla pustych miejsc
                 }
+
+                // Wyświetlanie symbolu
+                std::cout << board[row][col];
+
+                // Przywrócenie domyślnego koloru
+                setConsoleColor(7);
+
+                std::cout << " "; // Spacja po symbolu w domyślnym kolorze
             }
-            std::cout << "|\n";
-            for (size_t col = 0; col < board[row].size(); col++) {
+            std::cout << "|\n"; // Separator na końcu wiersza w domyślnym kolorze
+
+            // Rysowanie linii oddzielających
+            for (size_t col = 0; col < boardSize; col++) {
                 std::cout << "----";
             }
             std::cout << "\n";
@@ -265,7 +255,6 @@ int navigateColumn(std::vector<std::vector<char>>& board, size_t& selectedColumn
 
         //Obsługa klawiszy, na różnych systemach operacyjnych
         key = getKey();
-#ifdef _WIN32
         if (key == -32) {
             char arrowKey = getKey();
             if (arrowKey == 75) { //Strzałka w lewo
@@ -275,18 +264,6 @@ int navigateColumn(std::vector<std::vector<char>>& board, size_t& selectedColumn
                 selectedColumn = (selectedColumn + 1) % board[0].size();
             }
         }
-#else
-        if (key == '\033') {
-            getKey();
-            char arrowKey = getKey();
-            if (arrowKey == 'D') {
-                selectedColumn = (selectedColumn == 0) ? board[0].size() - 1 : selectedColumn - 1;
-            }
-            else if (arrowKey == 'C') {
-                selectedColumn = (selectedColumn + 1) % board[0].size();
-            }
-        }
-#endif
         else if (key == '\r' || key == '\n') {
             if (board[0][selectedColumn] == ' ') {
                 return selectedColumn;
@@ -320,7 +297,6 @@ int navigateMenu(const std::vector<std::string>& menuItems, bool allowExit, cons
 
         key = getKey();
 
-#ifdef _WIN32
         if (key == -32) { //Sprawdzanie czy jest kliknięta klawisz specjalny w systemie Windows, w naszym przypadku jest to strzałka
             char arrowKey = getKey();
             if (arrowKey == 72) { //Sprawdzanie czy jest kliknięta strzałka w górę
@@ -330,18 +306,6 @@ int navigateMenu(const std::vector<std::string>& menuItems, bool allowExit, cons
                 selectedIndex = (selectedIndex == menuItems.size() - 1) ? 0 : selectedIndex + 1;
             }
         }
-#else
-        if (key == '\033') {
-            getKey();
-            char arrowKey = getKey();
-            if (arrowKey == 'A') {
-                selectedIndex = (selectedIndex == 0) ? menuItems.size() - 1 : selectedIndex - 1;
-            }
-            else if (arrowKey == 'B') {
-                selectedIndex = (selectedIndex == menuItems.size() - 1) ? 0 : selectedIndex + 1;
-            }
-        }
-#endif
         else if (key == '\r' || key == '\n') { //Sprawdzanie czy kliknięty jest klawisze enter
             return selectedIndex;
         }

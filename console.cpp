@@ -1,45 +1,34 @@
-﻿#ifdef _WIN32
-#include <windows.h>
+﻿#include <windows.h>
 #include <conio.h>
-#else
-#include <locale>
-#include <termios.h>
-#include <unistd.h>
-#endif
-#include "console.h"
 
 /*Ustawianie kodowania konsoli na UTF-8 w zależności od systemu operacyjnego,
 aby poprawnie były wyświetlane polskie znaki*/
 void initializeConsole() {
-    #ifdef _WIN32
-        SetConsoleOutputCP(CP_UTF8);
-    #else
-        setlocale(LC_ALL, "pl_PL.UTF-8");
-    #endif
+    SetConsoleOutputCP(CP_UTF8);
 }
 
 //Funckja czyszcząca konsolę w zależności od systemu operacyjnego
 void consoleClear() {
-    #ifdef _WIN32
-        system("cls");
-    #else
-        system("clear");
-    #endif
+    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+    CONSOLE_SCREEN_BUFFER_INFO consoleInfo;
+    DWORD written;
+
+    if (GetConsoleScreenBufferInfo(hConsole, &consoleInfo)) {
+        COORD homeCoords = {0, 0};
+        DWORD consoleSize = consoleInfo.dwSize.X * consoleInfo.dwSize.Y;
+        FillConsoleOutputCharacter(hConsole, ' ', consoleSize, homeCoords, &written);
+        FillConsoleOutputAttribute(hConsole, consoleInfo.wAttributes, consoleSize, homeCoords, &written);
+        SetConsoleCursorPosition(hConsole, homeCoords);
+    }
 }
 
 //Funkcja pobierająca wciśnięty na klawiaturze znak, potrzebna do zrobienia interaktywnego menu
 char getKey() {
-#ifdef _WIN32
     return _getch();
-#else
-    struct termios oldt, newt;
-    char ch;
-    tcgetattr(STDIN_FILENO, &oldt);
-    newt = oldt;
-    newt.c_lflag &= ~(ICANON | ECHO);
-    tcsetattr(STDIN_FILENO, TCSANOW, &newt);
-    ch = getchar();
-    tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
-    return ch;
-#endif
+}
+
+//Funkcja zmieniająca kolory konsoli
+void setConsoleColor(int color) {
+    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+    SetConsoleTextAttribute(hConsole, color);
 }

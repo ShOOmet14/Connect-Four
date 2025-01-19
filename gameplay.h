@@ -6,6 +6,8 @@ extern bool playing; //Zmienna określająca czy gra jest w trakcie, główna p�
 extern int currentStartingPlayer; //Zmienna przechowująca informacje, który gracz zaczyna aktualną rundę
 extern int player1Score; //Przechowuje aktualny wynik gracza 1
 extern int player2Score; //Przechowuje aktualny wynik gracza 2
+extern int lastMoveRow;
+extern int lastMoveCol;
 
 /*Funkcja ta rozpoczyna rozgrywkę, można grać na innego gracza albo AI.
 rememberMode - jeżeli prawidziwa, to gra używa poprzedniego trybu (hot seat / vs AI)

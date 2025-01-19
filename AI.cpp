@@ -1,6 +1,4 @@
-﻿#include <algorithm>
-#include <climits>
-#include <vector>
+﻿#include <vector>
 #include "gameplay.h"
 #include "AI.h"
 
@@ -29,8 +27,8 @@ int evaluateBoard(const std::vector<std::vector<char>>& board, char aiSymbol, ch
             if (board[row][col] == aiSymbol) {
                 score += countConnected(board, row, col, 0, 1, aiSymbol); // Poziomo
                 score += countConnected(board, row, col, 1, 0, aiSymbol); // Pionowo
-                score += countConnected(board, row, col, 1, 1, aiSymbol); // Ukośnie
-                score += countConnected(board, row, col, 1, -1, aiSymbol); // Ukośnie //
+                score += countConnected(board, row, col, 1, 1, aiSymbol); // Ukośnie od lewej strony
+                score += countConnected(board, row, col, 1, -1, aiSymbol); // Ukośnie od prawej strony
             }
             else if (board[row][col] == playerSymbol) {
                 score -= countConnected(board, row, col, 0, 1, playerSymbol);
@@ -40,7 +38,6 @@ int evaluateBoard(const std::vector<std::vector<char>>& board, char aiSymbol, ch
             }
         }
     }
-
     return score;
 }
 

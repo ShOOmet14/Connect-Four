@@ -8,10 +8,9 @@
 #include "gameplay.h"
 
 //ustaiwnia domyślne, gdy nie zostały zmienione przez przez użytkownika
-int boardSize = 10;
-int checkSize = 5;
+int boardSize = 8;
+int checkSize = 4;
 bool polish = true;
-int animationSpeed = 100;
 char player1Symbol = 'X';
 char player2Symbol = 'O';
 int aiDifficulty = 3;
@@ -39,7 +38,6 @@ void loadSettings() {
         loadTranslations("English");
     }
 
-    inFile >> animationSpeed;
     inFile >> player1Symbol;
     inFile >> player2Symbol;
     inFile >> aiDifficulty;
@@ -59,7 +57,6 @@ void saveSettings() {
     outFile << boardSize << "\n";
     outFile << checkSize << "\n";
     outFile << (polish ? "Polski" : "English") << "\n";
-    outFile << animationSpeed << "\n";
     outFile << player1Symbol << "\n";
     outFile << player2Symbol << "\n";
     outFile << aiDifficulty << "\n";
@@ -89,11 +86,6 @@ void settings() {
         oss.clear();
 
         oss << std::left << std::setw((polish) ? 33 : 32) << T("Language") + ": " << "<" << (polish ? "Polski" : "English") << ">";
-        settingsMenu.push_back(oss.str());
-        oss.str("");
-        oss.clear();
-
-        oss << std::left << std::setw((polish) ? 34 : 32) << T("Animation Speed (ms)") + ": " << std::left << std::setw(5) << animationSpeed;
         settingsMenu.push_back(oss.str());
         oss.str("");
         oss.clear();
@@ -172,19 +164,7 @@ void settings() {
             }
             break;
 
-        case 3: //Zmiana szybkości animacji
-            consoleClear();
-            std::cout << T("Current Animation Speed") << ": " << animationSpeed << " ms\n";
-            std::cout << T("Enter new animation speed (0-1000, where 0 disables animation): ");
-            while (!(std::cin >> animationSpeed) || animationSpeed < 0 || animationSpeed > 1000) {
-                std::cin.clear();
-                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-                std::cout << T("Invalid value. Enter a number between 0 and 1000: ");
-            }
-            saveSettings();
-            break;
-
-        case 4: //Zmiana symbolu gracza 1
+        case 3: //Zmiana symbolu gracza 1
             consoleClear();
             std::cout << T("Current Player 1 Symbol") << ": " << player1Symbol << "\n";
             std::cout << T("Enter new symbol for Player 1 (exactly one character): ");
@@ -200,7 +180,7 @@ void settings() {
             saveSettings();
             break;
 
-        case 5: //Zmiana symbolu gracza 2
+        case 4: //Zmiana symbolu gracza 2
             consoleClear();
             std::cout << T("Current Player 2 Symbol") << ": " << player2Symbol << "\n";
             std::cout << T("Enter new symbol for Player 2 (exactly one character): ");
@@ -216,7 +196,7 @@ void settings() {
             saveSettings();
             break;
 
-        case 6: //Zmiana poziomu trudności AI
+        case 5: //Zmiana poziomu trudności AI
             result = changeSettings(
                 difficultyLevels,
                 settingsMenu,
@@ -268,7 +248,6 @@ int changeSettings(const std::vector<std::string>& settingItems, std::vector<std
 
         key = getKey();
 
-#ifdef _WIN32
         if (key == -32) {
             char arrowKey = getKey();
             if (arrowKey == 75) { //Strzałka w prawo
@@ -278,18 +257,6 @@ int changeSettings(const std::vector<std::string>& settingItems, std::vector<std
                 settingIndex = (settingIndex + 1) % settingItems.size();
             }
         }
-#else
-        if (key == '\033') {
-            GetKey();
-            char arrowKey = GetKey();
-            if (arrowKey == 'D') {
-                settingIndex = (settingIndex == 0) ? settingItems.size() - 1 : settingIndex - 1;
-            }
-            else if (arrowKey == 'C') {
-                settingIndex = (settingIndex + 1) % settingItems.size();
-            }
-        }
-#endif
         else if (key == '\r' || key == '\n') { //Aby zapisać i wyjść kliknij klawisz Enter
             return settingIndex;
         }
