@@ -7,7 +7,7 @@ void initializeConsole() {
     SetConsoleOutputCP(CP_UTF8);
 }
 
-//Funckja czyszcząca konsolę w zależności od systemu operacyjnego
+//Funckja czyszcząca konsolę w zależności od systemu operacyjnego, poniższy kod wziąłem z internetu
 void consoleClear() {
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
     CONSOLE_SCREEN_BUFFER_INFO consoleInfo;

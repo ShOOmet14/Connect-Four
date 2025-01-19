@@ -1,5 +1,7 @@
-﻿//W trakcie pisania kodu odkryłem, że taka gra już istniała i po angielsku nazwya się "Connect four" a po polsku "Czwórki"
-//https://github.com/nlohmann/json/tree/v3.11.3 - stąd biorę bibliotekę dodającą możliwość korzystania z plików Json
+﻿/*W trakcie pisania kodu odkryłem, że taka gra już istniała i po angielsku nazwya się "Connect four" a po polsku "Czwórki"
+https://github.com/nlohmann/json/tree/v3.11.3 - stąd biorę bibliotekę dodającą możliwość korzystania z plików Json
+Projekt na zajęcia z wstępu do programowania, nie jest skończony, chciałbym jeszcze dodać dużo do programu i spróbować więcej rzeczy,
+typu */
 
 #include <iostream>
 #include <chrono>
