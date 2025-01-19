@@ -41,6 +41,9 @@
     <None Include="resources\translations.json">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="README.md">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="console.h">
