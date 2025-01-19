@@ -1,286 +1,300 @@
-﻿#include "settings.h"
+﻿#include <fstream>
+#include <iostream>
+#include <sstream>
+#include <string>
 #include "translations.h"
 #include "console.h"
+#include "settings.h"
 #include "gameplay.h"
 
-int BoardSize = 10;
-int CheckSize = 5;
-bool Polish = true;
-int AnimationSpeed = 100;
-char Player1Symbol = 'X';
-char Player2Symbol = 'O';
-int AIDifficulty = 3; // Default to medium difficulty
+//ustaiwnia domyślne, gdy nie zostały zmienione przez przez użytkownika
+int boardSize = 10;
+int checkSize = 5;
+bool polish = true;
+int animationSpeed = 100;
+char player1Symbol = 'X';
+char player2Symbol = 'O';
+int aiDifficulty = 3;
 
-void LoadSettings() {
+/*Funkcja ta wczytuje ustawienia z pliku settings.txt i przypisuje je do
+odpowiadających zmiennych ustawień*/
+void loadSettings() {
     std::ifstream inFile("settings.txt");
     if (!inFile) {
         std::cerr << T("Error: settings.txt not found. Using default settings.") << "\n";
         return;
     }
 
-    inFile >> BoardSize;
-    inFile >> CheckSize;
+    inFile >> boardSize;
+    inFile >> checkSize;
 
     std::string language;
     inFile >> language;
     if (language == "Polski") {
-        Polish = true;
-        LoadTranslations("Polski");
+        polish = true;
+        loadTranslations("Polski");
     }
     else {
-        Polish = false;
-        LoadTranslations("English");
+        polish = false;
+        loadTranslations("English");
     }
 
-    inFile >> AnimationSpeed;
-    inFile >> Player1Symbol;
-    inFile >> Player2Symbol;
-    inFile >> AIDifficulty; // Load AI difficulty
+    inFile >> animationSpeed;
+    inFile >> player1Symbol;
+    inFile >> player2Symbol;
+    inFile >> aiDifficulty;
 
     inFile.close();
 }
 
-void SaveSettings() {
+/*Funkcja zapisująca ustawienia do pliku settings.txt, aby nie było trzeba
+za każdym razem zmieniać przy włączaniu gry*/
+void saveSettings() {
     std::ofstream outFile("settings.txt");
     if (!outFile) {
         std::cerr << T("Error: Failed to save settings to the file.") << "\n";
         return;
     }
 
-    outFile << BoardSize << "\n";
-    outFile << CheckSize << "\n";
-    outFile << (Polish ? "Polski" : "English") << "\n";
-    outFile << AnimationSpeed << "\n";
-    outFile << Player1Symbol << "\n";
-    outFile << Player2Symbol << "\n";
-    outFile << AIDifficulty << "\n"; // Save AI difficulty
+    outFile << boardSize << "\n";
+    outFile << checkSize << "\n";
+    outFile << (polish ? "Polski" : "English") << "\n";
+    outFile << animationSpeed << "\n";
+    outFile << player1Symbol << "\n";
+    outFile << player2Symbol << "\n";
+    outFile << aiDifficulty << "\n";
 
     outFile.close();
-    std::cout << T("Settings have been saved to settings.txt.") << "\n";
 }
 
-void Settings() {
-    const std::vector<std::string> difficultyLevels = { "Easy", "Medium", "Hard", "Very Hard", "Insane" };
-    int difficultyIndex = AIDifficulty - 1; // Map AIDifficulty (1-5) to index (0-4)
-    int languageIndex = Polish ? 1 : 0; // 0 for English, 1 for Polski
+/*Funcjka, która stanowi główne menu ustawień gry, umożliwia zmianę różnych ustawień*/
+void settings() {
+    int difficultyIndex = aiDifficulty - 1;
+    int languageIndex = polish ? 1 : 0;
     int result;
 
     while (true) {
+        std::vector<std::string> difficultyLevels = { T("Easy"), T("Medium"), T("Hard"), T("Very Hard"), T("Insane") };
         std::ostringstream oss;
         std::vector<std::string> settingsMenu;
 
-        // Dynamically format and display each setting
-        oss << std::left << std::setw(32) << T("Board Size") + ": " << std::left << std::setw(5) << BoardSize;
+        oss << std::left << std::setw(32) << T("Board Size") + ": " << std::left << std::setw(5) << boardSize;
         settingsMenu.push_back(oss.str());
         oss.str("");
         oss.clear();
 
-        oss << std::left << std::setw((Polish) ? 36 : 32) << T("Winning Line Length") + ": " << std::left << std::setw(5) << CheckSize;
+        oss << std::left << std::setw((polish) ? 35 : 32) << T("Winning Line Length") + ": " << std::left << std::setw(5) << checkSize;
         settingsMenu.push_back(oss.str());
         oss.str("");
         oss.clear();
 
-        oss << std::left << std::setw((Polish) ? 33 : 32) << T("Language") + ": " << "<" << (Polish ? "Polski" : "English") << ">";
+        oss << std::left << std::setw((polish) ? 33 : 32) << T("Language") + ": " << "<" << (polish ? "Polski" : "English") << ">";
         settingsMenu.push_back(oss.str());
         oss.str("");
         oss.clear();
 
-        oss << std::left << std::setw((Polish) ? 34 : 32) << T("Animation Speed (ms)") + ": " << std::left << std::setw(5) << AnimationSpeed;
+        oss << std::left << std::setw((polish) ? 34 : 32) << T("Animation Speed (ms)") + ": " << std::left << std::setw(5) << animationSpeed;
         settingsMenu.push_back(oss.str());
         oss.str("");
         oss.clear();
 
-        oss << std::left << std::setw(32) << T("Player 1 Symbol") + ": " << std::left << std::setw(5) << Player1Symbol;
+        oss << std::left << std::setw(32) << T("Player 1 Symbol") + ": " << std::left << std::setw(5) << player1Symbol;
         settingsMenu.push_back(oss.str());
         oss.str("");
         oss.clear();
 
-        oss << std::left << std::setw(32) << T("Player 2 Symbol") + ": " << std::left << std::setw(5) << Player2Symbol;
+        oss << std::left << std::setw(32) << T("Player 2 Symbol") + ": " << std::left << std::setw(5) << player2Symbol;
         settingsMenu.push_back(oss.str());
         oss.str("");
         oss.clear();
 
-        oss << std::left << std::setw(32) << T("AI Difficulty") + ": " << "<" << difficultyLevels[difficultyIndex] << ">";
+        oss << std::left << std::setw((polish) ? 33 : 32) << T("AI Difficulty") + ": " << "<" << difficultyLevels[difficultyIndex] << ">";
         settingsMenu.push_back(oss.str());
         oss.str("");
         oss.clear();
 
-        // Add the return option
+        //Dodanie opcji "powrót" do menu
         settingsMenu.push_back(T("Return"));
 
-        // Display the menu and allow navigation
-        size_t choice = NavigateMenu(
+        //Wyświetlanie menu z możliwością nawigacji
+        size_t choice = navigateMenu(
             settingsMenu,
             true,
             T("Settings"),
             T("Use arrows to navigate.\nPress Enter to edit.\nPress Esc to return.")
         );
 
+        //Wychodzenie, jeżeli wybrano "powrót" albo klinkięto klawisz Esc
         if (choice == -1 || choice == settingsMenu.size() - 1) {
-            // Exit the settings menu
             return;
         }
 
-        // Handle the user's choice
         switch (choice) {
-        case 0: // Edit Board Size
-            ConsoleClear();
-            std::cout << T("Current Board Size") << ": " << BoardSize << "\n";
-            std::cout << T("Enter new board size") << " (>= " << CheckSize * 2 << "): ";
-            while (!(std::cin >> BoardSize) || BoardSize < CheckSize * 2) {
+        case 0: //Edytowanie wielkości planszy
+            consoleClear();
+            std::cout << T("Current Board Size") << ": " << boardSize << "\n";
+            std::cout << T("Enter new board size") << " (>= " << checkSize * 2 << "): ";
+            while (!(std::cin >> boardSize) || boardSize < checkSize * 2) {
                 std::cin.clear();
                 std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-                std::cout << T("Invalid size. Enter a number larger than ") << CheckSize * 2 << ": ";
+                std::cout << T("Invalid size. Enter a number larger than ") << checkSize * 2 << ": ";
             }
-            SaveSettings();
+            saveSettings();
             break;
 
-        case 1: // Edit Winning Line Length
-            ConsoleClear();
-            std::cout << T("Current Winning Line Length") << ": " << CheckSize << "\n";
-            std::cout << T("Enter new winning line length") << " (1-" << BoardSize / 2 << "): ";
-            while (!(std::cin >> CheckSize) || CheckSize > BoardSize / 2) {
+        case 1: //Edytowanie długości rzędu symboli do wygranej
+            consoleClear();
+            std::cout << T("Current Winning Line Length") << ": " << checkSize << "\n";
+            std::cout << T("Enter new winning line length") << " (1-" << boardSize / 2 << "): ";
+            while (!(std::cin >> checkSize) || checkSize > boardSize / 2) {
                 std::cin.clear();
                 std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-                std::cout << T("Invalid size. Enter a number between 1 and ") << BoardSize / 2 << ": ";
+                std::cout << T("Invalid size. Enter a number between 1 and ") << boardSize / 2 << ": ";
             }
-            SaveSettings();
+            saveSettings();
             break;
 
-        case 2: // Change Language
-            result = ChangeSettings(
-                { "English", "Polski" }, // The list of language options
-                settingsMenu,            // The settings menu to update dynamically
-                2,                       // The index of Language in the settings menu
-                languageIndex,           // The current language index
-                T("Settings"),           // Header
+        case 2: //Zmiana języka, do wyboru są język angielski i język polski
+            result = changeSettings(
+                { "English", "Polski" },
+                settingsMenu,
+                2,
+                languageIndex,
+                T("Settings"),
                 T("Use left/right arrows to change language. Press Enter to save.\nPress Esc to cancel."),
-                T("Language")            // Label for this setting
+                T("Language")
             );
 
             if (result != -1) {
-                Polish = (result == 1); // Update the language setting (0 for English, 1 for Polski)
-                LoadTranslations(Polish ? "Polski" : "English"); // Load the appropriate translations
-                SaveSettings();
+                polish = (result == 1);
+                loadTranslations(polish ? "Polski" : "English");
+                saveSettings();
             }
             break;
 
-        case 3: // Edit Animation Speed
-            ConsoleClear();
-            std::cout << T("Current Animation Speed") << ": " << AnimationSpeed << " ms\n";
+        case 3: //Zmiana szybkości animacji
+            consoleClear();
+            std::cout << T("Current Animation Speed") << ": " << animationSpeed << " ms\n";
             std::cout << T("Enter new animation speed (0-1000, where 0 disables animation): ");
-            while (!(std::cin >> AnimationSpeed) || AnimationSpeed < 0 || AnimationSpeed > 1000) {
+            while (!(std::cin >> animationSpeed) || animationSpeed < 0 || animationSpeed > 1000) {
                 std::cin.clear();
                 std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
                 std::cout << T("Invalid value. Enter a number between 0 and 1000: ");
             }
-            SaveSettings();
+            saveSettings();
             break;
 
-        case 4: // Edit Player 1 Symbol
-            ConsoleClear();
-            std::cout << T("Current Player 1 Symbol") << ": " << Player1Symbol << "\n";
+        case 4: //Zmiana symbolu gracza 1
+            consoleClear();
+            std::cout << T("Current Player 1 Symbol") << ": " << player1Symbol << "\n";
             std::cout << T("Enter new symbol for Player 1 (exactly one character): ");
             while (true) {
                 std::string input;
                 std::cin >> input;
-                if (input.length() == 1 && input[0] != Player2Symbol && input[0] != ' ') {
-                    Player1Symbol = input[0];
+                if (input.length() == 1 && input[0] != player2Symbol && input[0] != ' ') {
+                    player1Symbol = input[0];
                     break;
                 }
                 std::cout << T("Invalid symbol. Enter one character different from Player 2's symbol and a space: ");
             }
-            SaveSettings();
+            saveSettings();
             break;
 
-        case 5: // Edit Player 2 Symbol
-            ConsoleClear();
-            std::cout << T("Current Player 2 Symbol") << ": " << Player2Symbol << "\n";
+        case 5: //Zmiana symbolu gracza 2
+            consoleClear();
+            std::cout << T("Current Player 2 Symbol") << ": " << player2Symbol << "\n";
             std::cout << T("Enter new symbol for Player 2 (exactly one character): ");
             while (true) {
                 std::string input;
                 std::cin >> input;
-                if (input.length() == 1 && input[0] != Player1Symbol && input[0] != ' ') {
-                    Player2Symbol = input[0];
+                if (input.length() == 1 && input[0] != player1Symbol && input[0] != ' ') {
+                    player2Symbol = input[0];
                     break;
                 }
                 std::cout << T("Invalid symbol. Enter one character different from Player 1's symbol and a space: ");
             }
-            SaveSettings();
+            saveSettings();
             break;
 
-        case 6: // AI Difficulty
-            result = ChangeSettings(
-                difficultyLevels, // The list of difficulty levels
-                settingsMenu,     // The settings menu to update dynamically
-                6,                // The index of AI Difficulty in the settings menu
-                difficultyIndex,  // The current difficulty index
-                T("Settings"),    // Header
+        case 6: //Zmiana poziomu trudności AI
+            result = changeSettings(
+                difficultyLevels,
+                settingsMenu,
+                6,
+                difficultyIndex,
+                T("Settings"),
                 T("Use left/right arrows to change difficulty. Press Enter to save.\nPress Esc to cancel."),
-                T("AI Difficulty")   // Label for this setting
+                T("AI Difficulty")
             );
 
             if (result != -1) {
-                AIDifficulty = result + 1; // Update the difficulty based on selection
-                SaveSettings();
+                aiDifficulty = result + 1;
+                saveSettings();
             }
             break;
         }
     }
 }
 
-int ChangeSettings(const std::vector<std::string>& settingItems, std::vector<std::string>& settingsMenu, size_t selectedIndex,
+/*Funkcja, która umożliwia dynamiczną zmianę ustawień gry typu zmiana języka czy poziomu trudności
+settingsItems - lista dostępnych wartości do wyboru, settingsMenu - aktualne menu ustawień,
+selectedIndex - indekst ustawienia, które użytkownik chce zmienić, settingIndex - aktualnie wybrane ustawienie
+header, footer, label - dodatkowe opisy, służące do wyświetlania menu*/
+int changeSettings(const std::vector<std::string>& settingItems, std::vector<std::string>& settingsMenu, size_t selectedIndex,
     int& settingIndex, const std::string& header, const std::string& footer, const std::string& label) {
     char key;
 
     while (true) {
-        ConsoleClear();
+        consoleClear();
 
         if (!header.empty()) {
             std::cout << header << "\n\n";
         }
 
-        // Update the selected setting in the settingsMenu dynamically
+        //Dynamiczne wyświetlanie zmienianego ustawienia
         std::ostringstream oss;
-        oss << std::left << std::setw((T(label) == "Język" && (Polish))?33:32) << T(label) + ": " << "<" << settingItems[settingIndex] << ">";
+        oss << std::left
+            << std::setw((T(label) == "Język" && polish) ? 33 : ((T(label) == "Poziom trudności" && polish) ? 33 : 32))
+            << T(label) + ": "
+            << "<" << settingItems[settingIndex] << ">";
         settingsMenu[selectedIndex] = oss.str();
 
-        // Display the updated menu
-        DisplayMenu(settingsMenu, selectedIndex);
+        //Wyświetlanie menu po zmianach
+        displayMenu(settingsMenu, selectedIndex);
 
         if (!footer.empty()) {
             std::cout << "\n" << footer;
         }
 
-        key = GetKey();
+        key = getKey();
 
 #ifdef _WIN32
-        if (key == -32) { // Arrow keys for Windows
-            char arrowKey = GetKey();
-            if (arrowKey == 75) { // Left Arrow
+        if (key == -32) {
+            char arrowKey = getKey();
+            if (arrowKey == 75) { //Strzałka w prawo
                 settingIndex = (settingIndex == 0) ? settingItems.size() - 1 : settingIndex - 1;
             }
-            else if (arrowKey == 77) { // Right Arrow
+            else if (arrowKey == 77) { //Strzałka w lewo
                 settingIndex = (settingIndex + 1) % settingItems.size();
             }
         }
 #else
-        if (key == '\033') { // Arrow keys for Linux/Mac
-            GetKey(); // Skip '['
+        if (key == '\033') {
+            GetKey();
             char arrowKey = GetKey();
-            if (arrowKey == 'D') { // Left Arrow
+            if (arrowKey == 'D') {
                 settingIndex = (settingIndex == 0) ? settingItems.size() - 1 : settingIndex - 1;
             }
-            else if (arrowKey == 'C') { // Right Arrow
+            else if (arrowKey == 'C') {
                 settingIndex = (settingIndex + 1) % settingItems.size();
             }
         }
 #endif
-        else if (key == '\r' || key == '\n') { // Enter key to save and exit
+        else if (key == '\r' || key == '\n') { //Aby zapisać i wyjść kliknij klawisz Enter
             return settingIndex;
         }
-        else if (key == 27) { // Escape key to cancel
-            return -1; // Exit without changes
+        else if (key == 27) { //Kliknij klawisz Esc aby anulować i wyjść
+            return -1;
         }
     }
 }

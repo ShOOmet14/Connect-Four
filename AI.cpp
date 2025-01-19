@@ -1,12 +1,13 @@
-﻿// AI.cpp - Optymalizacja AI dla gry Connect Four
-#include "AI.h"
-#include <algorithm>
+﻿#include <algorithm>
 #include <climits>
+#include <vector>
+#include "gameplay.h"
+#include "AI.h"
 
-/*Funkcja pomocnicza: policz ciąg symboli w danym kierunku
-Parametry
-Co ma zwracaj*/
-int CountConnected(const std::vector<std::vector<char>>& board, size_t row, size_t col, int dRow, int dCol, char symbol) {
+/*Funkcja ta liczy, ile sumboli jest połączonych na jednej linii na planszy w danym kierunku
+board - aktualny stan planszy, row/col - początkowa pozycja od której sprawdzamy, dRow/dCol - kierunek, w którym sprawdzamy
+(pionowo/poziomo/na ukos), symbol - symbol gracza*/
+int countConnected(const std::vector<std::vector<char>>& board, size_t row, size_t col, int dRow, int dCol, char symbol) {
     int count = 0;
     size_t n = board.size();
     while (row < n && col < n && board[row][col] == symbol) {
@@ -17,7 +18,8 @@ int CountConnected(const std::vector<std::vector<char>>& board, size_t row, size
     return count;
 }
 
-// Funkcja do oceny stanu planszy
+/*Ocena aktualnego stanu planszy, aby określić, kto ma przewagę: AI czy gracz.
+board - aktualny stan planszy, aiSymbol - symbol AI, playerSymbol - symbol gracza*/
 int evaluateBoard(const std::vector<std::vector<char>>& board, char aiSymbol, char playerSymbol) {
     int score = 0;
     size_t n = board.size();
@@ -25,16 +27,16 @@ int evaluateBoard(const std::vector<std::vector<char>>& board, char aiSymbol, ch
     for (size_t row = 0; row < n; ++row) {
         for (size_t col = 0; col < n; ++col) {
             if (board[row][col] == aiSymbol) {
-                score += CountConnected(board, row, col, 0, 1, aiSymbol); // Poziomo
-                score += CountConnected(board, row, col, 1, 0, aiSymbol); // Pionowo
-                score += CountConnected(board, row, col, 1, 1, aiSymbol); // Ukośnie \ 
-                score += CountConnected(board, row, col, 1, -1, aiSymbol); // Ukośnie //
+                score += countConnected(board, row, col, 0, 1, aiSymbol); // Poziomo
+                score += countConnected(board, row, col, 1, 0, aiSymbol); // Pionowo
+                score += countConnected(board, row, col, 1, 1, aiSymbol); // Ukośnie \ 
+                score += countConnected(board, row, col, 1, -1, aiSymbol); // Ukośnie //
             }
             else if (board[row][col] == playerSymbol) {
-                score -= CountConnected(board, row, col, 0, 1, playerSymbol);
-                score -= CountConnected(board, row, col, 1, 0, playerSymbol);
-                score -= CountConnected(board, row, col, 1, 1, playerSymbol);
-                score -= CountConnected(board, row, col, 1, -1, playerSymbol);
+                score -= countConnected(board, row, col, 0, 1, playerSymbol);
+                score -= countConnected(board, row, col, 1, 0, playerSymbol);
+                score -= countConnected(board, row, col, 1, 1, playerSymbol);
+                score -= countConnected(board, row, col, 1, -1, playerSymbol);
             }
         }
     }
@@ -42,9 +44,12 @@ int evaluateBoard(const std::vector<std::vector<char>>& board, char aiSymbol, ch
     return score;
 }
 
-// Funkcja minimax z cięciami alfa-beta
+/*Implementuje algorytm minimax z cięciami alfa-beta, który jest podstawą AI.
+board - aktualny stan planszy, depth - maksymalna głębokość przeszukiwania, isMaximizing - czy obecnie optymalizujemy
+wynik dla AI,czy minimalizujemy winik gracza, aiSymbol/playerSymbol - symbole AI i gracza, alpha/beta - wartości dla cięć alfa-beta,
+które redukują liczbę stanów do analizy*/
 int minimax(std::vector<std::vector<char>>& board, int depth, bool isMaximizing, char aiSymbol, char playerSymbol, int alpha, int beta) {
-    if (depth == 0 || CheckWin(board, aiSymbol) || CheckWin(board, playerSymbol)) {
+    if (depth == 0 || checkWin(board, aiSymbol) || checkWin(board, playerSymbol)) {
         return evaluateBoard(board, aiSymbol, playerSymbol);
     }
 
@@ -94,8 +99,9 @@ int minimax(std::vector<std::vector<char>>& board, int depth, bool isMaximizing,
     }
 }
 
-// Funkcja główna: Wybierz najlepszy ruch AI
-size_t GetAIMove(std::vector<std::vector<char>>& board, char aiSymbol, int depth) {
+/*Funckja ta polega na wybraniu najlepszego możliwego ruchu dla AI.
+board - aktualny stan planszy, aiSymbol - symbol AI, depth - głębokość przeszukiwania (im głębsza, tym lepsza decyzja ai)*/
+size_t getAIMove(std::vector<std::vector<char>>& board, char aiSymbol, int depth) {
     int bestScore = INT_MIN;
     size_t bestMove = 0;
 

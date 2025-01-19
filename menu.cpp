@@ -1,10 +1,15 @@
-﻿#include "menu.h"
-#include "gameplay.h"
-#include "translations.h"
-#include "settings.h"
+﻿#include <vector>
+#include <string>
+#include <sstream>
 #include "console.h"
+#include "translations.h"
+#include "menu.h"
+#include "gameplay.h"
+#include "settings.h"
 
-void MainMenu() {
+/*Wyświetla główne menu gry z następującymi opcjami: Graj, Ustawienia, Pokaż wynik, Samouczek, Wyjście.
+W zależności od wyboru obsługike odpowiednią funkcję*/
+void mainMenu() {
     std::vector<std::string> menuItems = {
         T("Play"),
         T("Settings"),
@@ -13,54 +18,57 @@ void MainMenu() {
         T("Exit")
     };
 
-    size_t choice = NavigateMenu(menuItems, true, T("Main menu"), T("Use arrows to navigate.\nPress Enter to select.\nPress Esc to return."));
+    size_t choice = navigateMenu(menuItems, true, T("Main menu"), T("Use arrows to navigate.\nPress Enter to select.\nPress Esc to return."));
 
     switch (choice) {
     case 0:
-        Play();
+        play();
         break;
     case 1:
-        Settings();
+        settings();
         break;
     case 2:
-        ShowScores();
+        showScores();
         break;
     case 3:
-        ShowTutorial();
+        showTutorial();
         break;
     case 4:
     case -1:
-        Exit();
+        exit();
         break;
     }
 }
 
-void ShowScores() {
-    ConsoleClear();
+//Funkcja ta wyświetla aktualne wyniki graczy, punkty dla gracza 1 i gracza 2
+void showScores() {
+    consoleClear();
 
     std::ostringstream currentScore;
     currentScore << T("Player Scores:") << "\n";
-    currentScore << T("Player 1") << " (" << Player1Symbol << "): " << Player1Score << " " << T("points") << "\n";
-    currentScore << T("Player 2") << " (" << Player2Symbol << "): " << Player2Score << " " << T("points") << "\n";
+    currentScore << T("Player 1") << " (" << player1Symbol << "): " << player1Score << " " << T("points") << "\n";
+    currentScore << T("Player 2") << " (" << player2Symbol << "): " << player2Score << " " << T("points") << "\n";
     std::string header = currentScore.str();
 
     std::vector<std::string> menuItems = { T("Return to Main Menu") };
 
-    size_t choice = NavigateMenu(menuItems, true, header, T("Press Enter or Esc to return to the main menu."));
+    size_t choice = navigateMenu(menuItems, true, header, T("Press Enter or Esc to return to the main menu."));
 
-    if (choice == 0 || choice == -1) { // Powrót do menu głównego
+    if (choice == 0 || choice == -1) {
         return;
     }
 }
 
-void ShowTutorial() {
-    ConsoleClear();
+/*Funkcja ta wyświetla zasady i instrukcje dotyczące gry, są w nich między innymi:
+cel gry, zasady wykonywania ruchów, kontrolowanie*/
+void showTutorial() {
+    consoleClear();
     std::ostringstream tutorialContent;
 
     tutorialContent << "===== " << T("Tutorial") << " =====\n\n";
     tutorialContent << "1. " << T("Game Objective:") << "\n";
-    tutorialContent << "   - " << T("Place your symbols") << " (" << Player1Symbol << " " << T("or") << " " << Player2Symbol << ") " << T("in a single line.") << "\n";
-    tutorialContent << "   - " << T("The player who first aligns") << " " << CheckSize << " " << T("symbols vertically, horizontally, or diagonally wins.") << "\n\n";
+    tutorialContent << "   - " << T("Place your symbols") << " (" << player1Symbol << " " << T("or") << " " << player2Symbol << ") " << T("in a single line.") << "\n";
+    tutorialContent << "   - " << T("The player who first aligns") << " " << checkSize << " " << T("symbols vertically, horizontally, or diagonally wins.") << "\n\n";
     tutorialContent << "2. " << T("Game Rules:") << "\n";
     tutorialContent << "   - " << T("Players take turns making moves.") << "\n";
     tutorialContent << "   - " << T("Symbols fall to the lowest available spot in the selected column.") << "\n";
@@ -82,18 +90,19 @@ void ShowTutorial() {
 
     std::vector<std::string> menuItems = { T("Return to Main Menu") };
 
-    size_t choice = NavigateMenu(menuItems, true, header, T("Press Enter or Esc to return to the main menu."));
+    size_t choice = navigateMenu(menuItems, true, header, T("Press Enter or Esc to return to the main menu."));
 
-    if (choice == 0 || choice == -1) { // Powrót do menu głównego
+    if (choice == 0 || choice == -1) {
         return;
     }
 }
 
-void Exit() {
+//Pyta się użytkownika czy chce wyjść, jeżeli chce to kończy główną pętlę gry i zamyka program
+void exit() {
     std::vector<std::string> exitItems = { T("Yes"), T("No") };
-    size_t choice = NavigateMenu(exitItems, false, T("Are you sure you want to exit?"));
+    size_t choice = navigateMenu(exitItems, false, T("Are you sure you want to exit?"));
 
     if (choice == 0) {
-        Playing = false;
+        playing = false;
     }
 }

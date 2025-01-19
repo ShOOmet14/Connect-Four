@@ -1,31 +1,31 @@
 ﻿#pragma once
-#include <fstream> //użwana do zapisywania i wczytywania ustawień gry z pliku
-#include <iomanip> //używam tej biblioteki do wyświetlania konkretnych ustawień w tej samej kolumnie
-#include <limits> //używam w trakcie sprawdzania czy użytkownik wpisał odpowiednią wartość
-#include "gameplay.h"
-#include "translations.h"
+#include <string>
+#include <vector>
 
-#define NOMINMAX   // Wyłączenie makr min i max w windows.h, ponieważ wywołują konflikt, a ich nie potrzebuję
+extern int boardSize; //Rozmiar planszy gry
+extern int checkSize; //Liczba symboli w rzędzie, która wymagana jest do wygrania
+extern bool polish; //Zmienna, która ustawią język na polski, albo angielski
+extern int animationSpeed; //prędkość animacji (spadania symboli) w milisekundach
+extern char player1Symbol; //symbol gracza 1
+extern char player2Symbol; //symbol gracza 2
+extern int aiDifficulty; //poziom trudności AI, w skali 1-5
 
-//zmienne ustawień
-extern int BoardSize;
-extern int CheckSize;
-extern bool Polish;
-extern int AnimationSpeed;
-extern char Player1Symbol;
-extern char Player2Symbol;
-extern int AIDifficulty;
+/*Funkcja ta wczytuje ustawienia z pliku settings.txt i przypisuje je do 
+odpowiadających zmiennych ustawień*/
+void loadSettings();
 
-//Ładowanie ustawień programu z pliku
-void LoadSettings();
+/*Funkcja zapisująca ustawienia do pliku settings.txt, aby nie było trzeba 
+za każdym razem zmieniać przy włączaniu gry*/
+void saveSettings();
 
-//Zapisywanie ustawienia programu do pliu
-void SaveSettings();
+/*Funcjka, która stanowi główne menu ustawień gry, umożliwia zmianę różnych ustawień*/
+void settings();
 
-//Główna funkcja interfejsu ustawień
-void Settings();
-
-int ChangeSettings(const std::vector<std::string>& settingItems,
+/*Funkcja, która umożliwia dynamiczną zmianę ustawień gry typu zmiana języka czy poziomu trudności
+settingsItems - lista dostępnych wartości do wyboru, settingsMenu - aktualne menu ustawień, 
+selectedIndex - indekst ustawienia, które użytkownik chce zmienić, settingIndex - aktualnie wybrane ustawienie
+header, footer, label - dodatkowe opisy, służące do wyświetlania menu*/
+int changeSettings(const std::vector<std::string>& settingItems,
     std::vector<std::string>& settingsMenu,
     size_t selectedIndex,
     int& settingIndex,
