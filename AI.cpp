@@ -29,7 +29,7 @@ int evaluateBoard(const std::vector<std::vector<char>>& board, char aiSymbol, ch
             if (board[row][col] == aiSymbol) {
                 score += countConnected(board, row, col, 0, 1, aiSymbol); // Poziomo
                 score += countConnected(board, row, col, 1, 0, aiSymbol); // Pionowo
-                score += countConnected(board, row, col, 1, 1, aiSymbol); // Ukośnie \ 
+                score += countConnected(board, row, col, 1, 1, aiSymbol); // Ukośnie
                 score += countConnected(board, row, col, 1, -1, aiSymbol); // Ukośnie //
             }
             else if (board[row][col] == playerSymbol) {
@@ -122,6 +122,5 @@ size_t getAIMove(std::vector<std::vector<char>>& board, char aiSymbol, int depth
             }
         }
     }
-
     return bestMove;
 }
