@@ -200,7 +200,7 @@ void settings() {
             result = changeSettings(
                 difficultyLevels,
                 settingsMenu,
-                6,
+                5,
                 difficultyIndex,
                 T("Settings"),
                 T("Use left/right arrows to change difficulty. Press Enter to save.\nPress Esc to cancel."),
@@ -251,7 +251,7 @@ int changeSettings(const std::vector<std::string>& settingItems, std::vector<std
         if (key == -32) {
             char arrowKey = getKey();
             if (arrowKey == 75) { //Strzałka w prawo
-                settingIndex = (settingIndex == 0) ? settingItems.size() - 1 : settingIndex - 1;
+                settingIndex = (settingIndex == 0) ? (int)settingItems.size() - 1 : settingIndex - 1;
             }
             else if (arrowKey == 77) { //Strzałka w lewo
                 settingIndex = (settingIndex + 1) % settingItems.size();

@@ -164,7 +164,7 @@ void play(bool rememberMode, bool previousAgainstAI) {
 
 //Funkcja, która sprawdza czy dany symbol ułożył ciąg wystarczającej długości w pionie, poziomie i na ukos, aby wygrać
 bool checkWin(const std::vector<std::vector<char>>& board, char symbol) {
-    int n = board.size();
+    int n = (int)board.size();
     std::vector<std::pair<int, int>> directions = { {0, 1}, {1, 0}, {1, 1}, {1, -1} };
 
     for (int row = 0; row < n; row++) {
@@ -266,7 +266,7 @@ int navigateColumn(std::vector<std::vector<char>>& board, size_t& selectedColumn
         }
         else if (key == '\r' || key == '\n') {
             if (board[0][selectedColumn] == ' ') {
-                return selectedColumn;
+                return (int)selectedColumn;
             }
             else { //Jeżeli kolumna jest już pełna
                 std::cout << T("\nThis column is full\n");
@@ -307,7 +307,7 @@ int navigateMenu(const std::vector<std::string>& menuItems, bool allowExit, cons
             }
         }
         else if (key == '\r' || key == '\n') { //Sprawdzanie czy kliknięty jest klawisze enter
-            return selectedIndex;
+            return (int)selectedIndex;
         }
         else if (key == 27 && allowExit) { //Sprawdzanie czy kliknięty jest klawisz Esc
             return -1; //Wyjście z menu do poprzedniego

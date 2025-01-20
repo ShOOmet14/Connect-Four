@@ -56,7 +56,7 @@ int minimax(std::vector<std::vector<char>>& board, int depth, bool isMaximizing,
             // Sprawdź, czy można wykonać ruch w tej kolumnie
             if (board[0][col] == ' ') {
                 // Symuluj ruch AI
-                for (int row = board.size() - 1; row >= 0; --row) {
+                for (int row = (int)board.size() - 1; row >= 0; --row) {
                     if (board[row][col] == ' ') {
                         board[row][col] = aiSymbol;
                         int eval = minimax(board, depth - 1, false, aiSymbol, playerSymbol, alpha, beta);
@@ -77,7 +77,7 @@ int minimax(std::vector<std::vector<char>>& board, int depth, bool isMaximizing,
         int minEval = INT_MAX;
         for (size_t col = 0; col < board[0].size(); ++col) {
             if (board[0][col] == ' ') {
-                for (int row = board.size() - 1; row >= 0; --row) {
+                for (int row = (int)board.size() - 1; row >= 0; --row) {
                     if (board[row][col] == ' ') {
                         board[row][col] = playerSymbol;
                         int eval = minimax(board, depth - 1, true, aiSymbol, playerSymbol, alpha, beta);
@@ -104,7 +104,7 @@ size_t getAIMove(std::vector<std::vector<char>>& board, char aiSymbol, int depth
 
     for (size_t col = 0; col < board[0].size(); ++col) {
         if (board[0][col] == ' ') {
-            for (int row = board.size() - 1; row >= 0; --row) {
+            for (int row = (int)board.size() - 1; row >= 0; --row) {
                 if (board[row][col] == ' ') {
                     board[row][col] = aiSymbol;
                     int score = minimax(board, depth - 1, false, aiSymbol, 'X', INT_MIN, INT_MAX);
